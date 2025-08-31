@@ -61,10 +61,16 @@
       "name": "Test Category",
       "order": 4,
       "products": []
+    },
+    {
+      "id": "category-1756681813088",
+      "name": "Test Security Category",
+      "order": 5,
+      "products": []
     }
   ],
   "metadata": {
-    "lastUpdated": "2025-08-31T22:48:26.298Z",
+    "lastUpdated": "2025-08-31T23:18:42.903Z",
     "version": "1.0.0"
   }
 }
