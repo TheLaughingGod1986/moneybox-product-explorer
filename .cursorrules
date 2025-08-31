@@ -1,0 +1,54 @@
+# Cursor Rules for Moneybox Product Explorer
+
+## Project Context
+This is a React-based product showcase application for Moneybox financial services. The project enables business users to manage product content without developer intervention while providing a robust API for cross-platform access.
+
+## Key Requirements
+- Follow the specifications in PRD.json for all development decisions
+- Maintain 80%+ test coverage with Vitest and React Testing Library
+- Ensure all code meets the quality gates defined in PRD.json
+- Keep bundle size under 1MB and API responses under 200ms
+- Follow React 18 best practices with hooks pattern
+- Use inline CSS-in-JS for styling (no external CSS files)
+
+## Architecture Guidelines
+- Frontend: React 18 + Vite + Lucide React icons
+- Backend: Node.js + Express.js + JSON file storage
+- No external state management libraries (use React hooks)
+- RESTful API design following OpenAPI standards
+- Mobile-first responsive design approach
+
+## Code Standards
+- Use modern JavaScript (ES2022+) features
+- Prefer functional components with hooks over class components
+- Follow the component structure defined in PRD.json ui_components section
+- Include comprehensive error handling and loading states
+- Implement proper accessibility (WCAG 2.1 AA compliance)
+
+## Testing Requirements
+- Write unit tests for all components and utilities
+- Include integration tests for API endpoints
+- Test user interactions and error scenarios
+- Mock external dependencies appropriately
+- Verify responsive behavior and accessibility
+
+## Performance Standards
+- Optimize for Core Web Vitals (LCP < 2.5s, FID < 100ms, CLS < 0.1)
+- Implement lazy loading for images and non-critical components
+- Use React.memo and useMemo for expensive calculations
+- Minimize re-renders with proper dependency arrays
+
+## When suggesting code changes:
+1. Always reference the relevant PRD.json sections
+2. Consider the user stories and acceptance criteria
+3. Ensure changes align with the technical requirements
+4. Include appropriate tests with implementation
+5. Check against the quality gates before suggesting
+
+## Priority Levels (from PRD.json):
+- P0 (Must Have): Core functionality required for MVP
+- P1 (Should Have): Enhanced features for Phase 2
+- P2 (Could Have): Nice-to-have improvements
+- P3 (Won't Have Initially): Future enhancements
+
+Focus development efforts according to these priorities.

@@ -1,0 +1,693 @@
+{
+  "project": {
+    "name": "Moneybox Product Explorer",
+    "version": "1.0.0",
+    "type": "web_application",
+    "domain": "fintech",
+    "purpose": "Centralized product showcase with business user content management",
+    "timeline": {
+      "mvp_completed": "2025-08-31",
+      "production_ready": "2025-09-15",
+      "phase_2": "2025-10-15"
+    }
+  },
+  "stakeholders": {
+    "primary": [
+      {
+        "role": "Business Content Manager",
+        "needs": ["self_service_content_management", "real_time_updates", "no_technical_skills_required"],
+        "pain_points": ["developer_dependency", "slow_content_updates", "lack_of_control"]
+      },
+      {
+        "role": "End Customer", 
+        "needs": ["product_discovery", "clear_information", "mobile_friendly"],
+        "pain_points": ["overwhelming_options", "unclear_differences", "hard_to_find_products"]
+      },
+      {
+        "role": "Mobile Developer",
+        "needs": ["consistent_api", "reliable_data", "good_documentation"],
+        "pain_points": ["inconsistent_formats", "outdated_information", "integration_complexity"]
+      }
+    ],
+    "secondary": ["marketing_team", "legal_team", "compliance_team"]
+  },
+  "business_goals": {
+    "primary": [
+      "Enable business self-service content management",
+      "Centralize product information across platforms", 
+      "Improve customer product discovery",
+      "Reduce development team overhead"
+    ],
+    "kpis": [
+      {
+        "metric": "content_update_time",
+        "target": "< 5 minutes",
+        "current": "2-3 days"
+      },
+      {
+        "metric": "developer_time_on_content",
+        "target": "90% reduction",
+        "current": "15-20% of sprint capacity"
+      },
+      {
+        "metric": "product_discovery_engagement",
+        "target": "40% increase",
+        "current": "baseline_tbd"
+      }
+    ]
+  },
+  "technical_requirements": {
+    "architecture": {
+      "frontend": {
+        "framework": "React 18",
+        "build_tool": "Vite",
+        "styling": "CSS-in-JS (inline)",
+        "state_management": "React hooks",
+        "routing": "React Router (if needed)",
+        "icons": "Lucide React"
+      },
+      "backend": {
+        "runtime": "Node.js",
+        "framework": "Express.js",
+        "data_storage": "JSON files (upgradeable to database)",
+        "api_style": "REST",
+        "middleware": ["cors", "express.json"]
+      },
+      "deployment": {
+        "frontend": ["Netlify", "Vercel", "Static hosting"],
+        "backend": ["Railway", "Render", "Node.js hosting"],
+        "assets": ["CDN", "Cloudinary", "AWS S3"]
+      }
+    },
+    "performance": {
+      "page_load_time": "< 2 seconds",
+      "api_response_time": "< 200ms",
+      "bundle_size": "< 1MB",
+      "lighthouse_score": "> 90",
+      "mobile_performance": "60fps animations"
+    },
+    "compatibility": {
+      "browsers": ["Chrome 90+", "Firefox 88+", "Safari 14+", "Edge 90+"],
+      "mobile": ["iOS 14+", "Android 10+"],
+      "screen_sizes": "320px to 4K displays"
+    },
+    "scalability": {
+      "max_categories": 50,
+      "max_products": 500,
+      "concurrent_requests": 1000,
+      "database_migration_ready": true
+    }
+  },
+  "functional_requirements": {
+    "core_features": [
+      {
+        "id": "F1",
+        "name": "Product Category Management",
+        "priority": "P0",
+        "description": "Display and manage product categories in grid layout",
+        "acceptance_criteria": [
+          "Categories displayed in responsive grid layout",
+          "Navigation arrows for browsing categories", 
+          "Show 3 categories simultaneously on desktop",
+          "Support category creation, editing, deletion",
+          "Real-time updates without page refresh"
+        ]
+      },
+      {
+        "id": "F2", 
+        "name": "Product Information Display",
+        "priority": "P0",
+        "description": "Expandable product cards with detailed information",
+        "acceptance_criteria": [
+          "Clickable product cards expand to show details",
+          "Display product name, icon, description",
+          "Smooth expand/collapse animations",
+          "Support emoji icons and rich text",
+          "Mobile responsive card layouts"
+        ]
+      },
+      {
+        "id": "F3",
+        "name": "Admin Interface",
+        "priority": "P0", 
+        "description": "Business user content management interface",
+        "acceptance_criteria": [
+          "Settings icon to access admin mode",
+          "Modal-based content management",
+          "Category CRUD with real-time preview",
+          "Product CRUD within categories",
+          "Form validation and error handling",
+          "No authentication required (internal tool)"
+        ]
+      },
+      {
+        "id": "F4",
+        "name": "RESTful API",
+        "priority": "P0",
+        "description": "API endpoints for cross-platform access",
+        "acceptance_criteria": [
+          "GET /api/categories - retrieve all data",
+          "POST /api/categories - create category",
+          "PUT /api/categories/:id - update category",
+          "DELETE /api/categories/:id - delete category",
+          "POST /api/products - create product",
+          "PUT /api/products/:id - update product",
+          "DELETE /api/products/:id - delete product",
+          "GET /api/health - health check"
+        ]
+      }
+    ],
+    "enhanced_features": [
+      {
+        "id": "F5",
+        "name": "Image Upload System",
+        "priority": "P1",
+        "description": "Drag-and-drop image management",
+        "acceptance_criteria": [
+          "Drag-and-drop image upload interface",
+          "Image optimization and resizing",
+          "Support PNG, JPG, SVG formats",
+          "CDN integration for fast loading"
+        ]
+      },
+      {
+        "id": "F6",
+        "name": "Advanced Content Management", 
+        "priority": "P1",
+        "description": "Rich content editing capabilities",
+        "acceptance_criteria": [
+          "Rich text editor for descriptions",
+          "Product ordering within categories",
+          "Bulk operations support",
+          "Content preview before publishing"
+        ]
+      }
+    ]
+  },
+  "user_stories": [
+    {
+      "id": "US1",
+      "epic": "Content Management",
+      "role": "Business Content Manager",
+      "story": "I want to add new product categories so that I can organize products as our offerings expand",
+      "acceptance_criteria": [
+        "Admin interface accessible via settings icon",
+        "Category creation form with validation",
+        "Real-time preview of new category", 
+        "Success confirmation after creation",
+        "New category appears immediately"
+      ],
+      "priority": "High",
+      "story_points": 3
+    },
+    {
+      "id": "US2", 
+      "epic": "Content Management",
+      "role": "Business Content Manager",
+      "story": "I want to add products to existing categories so that customers can discover new financial products",
+      "acceptance_criteria": [
+        "Product creation form within category management",
+        "Fields for name, description, icon",
+        "Emoji picker for product icons",
+        "Product appears immediately after creation",
+        "Form validation for required fields"
+      ],
+      "priority": "High",
+      "story_points": 5
+    },
+    {
+      "id": "US3",
+      "epic": "Customer Discovery", 
+      "role": "Potential Customer",
+      "story": "I want to browse product categories so that I can understand what financial products are available",
+      "acceptance_criteria": [
+        "Categories in clear grid layout",
+        "Navigation arrows between categories",
+        "Responsive design for mobile/desktop",
+        "Category titles clearly visible",
+        "Smooth transitions between views"
+      ],
+      "priority": "High",
+      "story_points": 3
+    },
+    {
+      "id": "US4",
+      "epic": "API Integration",
+      "role": "Mobile Developer", 
+      "story": "I want to fetch current product information via API so that the mobile app displays consistent data",
+      "acceptance_criteria": [
+        "GET /api/categories returns all data",
+        "Response time under 200ms",
+        "Consistent JSON schema",
+        "Error handling for network issues",
+        "Comprehensive API documentation"
+      ],
+      "priority": "High", 
+      "story_points": 5
+    }
+  ],
+  "data_models": {
+    "Category": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier",
+          "required": true,
+          "example": "savings"
+        },
+        "name": {
+          "type": "string", 
+          "description": "Display name",
+          "required": true,
+          "example": "Savings"
+        },
+        "description": {
+          "type": "string",
+          "description": "Category description",
+          "required": false,
+          "example": "Save money with competitive rates"
+        },
+        "order": {
+          "type": "number",
+          "description": "Display order",
+          "required": true,
+          "example": 1
+        },
+        "products": {
+          "type": "array",
+          "description": "Array of products in category",
+          "items": "Product",
+          "required": true
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "ISO 8601",
+          "description": "Creation timestamp",
+          "required": true
+        },
+        "updatedAt": {
+          "type": "string", 
+          "format": "ISO 8601",
+          "description": "Last update timestamp",
+          "required": true
+        }
+      }
+    },
+    "Product": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier", 
+          "required": true,
+          "example": "cash-isa"
+        },
+        "name": {
+          "type": "string",
+          "description": "Product name",
+          "required": true,
+          "example": "Cash ISA"
+        },
+        "description": {
+          "type": "string",
+          "description": "Product description",
+          "required": true,
+          "example": "A tax-free way to save up to £20,000 per year"
+        },
+        "icon": {
+          "type": "string",
+          "description": "Emoji or image URL",
+          "required": true,
+          "example": "💰"
+        },
+        "order": {
+          "type": "number",
+          "description": "Order within category",
+          "required": true,
+          "example": 1
+        },
+        "featured": {
+          "type": "boolean", 
+          "description": "Highlight this product",
+          "required": false,
+          "default": false
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "ISO 8601", 
+          "description": "Creation timestamp",
+          "required": true
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "ISO 8601",
+          "description": "Last update timestamp", 
+          "required": true
+        }
+      }
+    }
+  },
+  "api_endpoints": [
+    {
+      "method": "GET",
+      "path": "/api/categories",
+      "description": "Retrieve all categories with products",
+      "parameters": [],
+      "response": {
+        "200": {
+          "description": "Success",
+          "schema": {
+            "categories": "Category[]",
+            "metadata": {
+              "lastUpdated": "string",
+              "version": "string", 
+              "totalCategories": "number",
+              "totalProducts": "number"
+            }
+          }
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/categories", 
+      "description": "Create new category",
+      "request_body": {
+        "name": "string (required)",
+        "description": "string (optional)"
+      },
+      "response": {
+        "201": {
+          "description": "Category created",
+          "schema": "Category"
+        },
+        "400": {
+          "description": "Validation error"
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/products",
+      "description": "Create new product",
+      "request_body": {
+        "categoryId": "string (required)",
+        "name": "string (required)", 
+        "description": "string (required)",
+        "icon": "string (optional)",
+        "featured": "boolean (optional)"
+      },
+      "response": {
+        "201": {
+          "description": "Product created",
+          "schema": "Product"
+        }
+      }
+    },
+    {
+      "method": "GET", 
+      "path": "/api/health",
+      "description": "Health check endpoint",
+      "response": {
+        "200": {
+          "description": "Service healthy",
+          "schema": {
+            "status": "OK",
+            "timestamp": "ISO 8601 string"
+          }
+        }
+      }
+    }
+  ],
+  "ui_components": {
+    "ProductExplorer": {
+      "description": "Main application component",
+      "props": {},
+      "state": [
+        "data (product/category data)",
+        "expandedProducts (array of expanded product IDs)",
+        "isAdmin (boolean admin mode toggle)",
+        "showAdmin (boolean admin panel visibility)",
+        "currentCategoryIndex (number for navigation)"
+      ],
+      "children": ["CategoryCard", "AdminPanel"]
+    },
+    "CategoryCard": {
+      "description": "Individual category display component",
+      "props": {
+        "category": "Category object",
+        "expandedProducts": "array of expanded product IDs", 
+        "onProductToggle": "function to toggle product expansion",
+        "isAdmin": "boolean for admin mode",
+        "onEdit": "function for editing category",
+        "onDelete": "function for deleting category"
+      },
+      "children": ["ProductCard"]
+    },
+    "ProductCard": {
+      "description": "Individual product display component", 
+      "props": {
+        "product": "Product object",
+        "isExpanded": "boolean expansion state",
+        "onToggle": "function to toggle expansion"
+      },
+      "styling": {
+        "expand_animation": "slideDown 0.3s ease-out",
+        "hover_effects": "background color transition",
+        "mobile_responsive": "full width on mobile"
+      }
+    },
+    "AdminPanel": {
+      "description": "Content management interface",
+      "props": {
+        "data": "full application data",
+        "onDataUpdate": "function to update data",
+        "onClose": "function to close panel"
+      },
+      "features": [
+        "Category creation form",
+        "Product creation within categories", 
+        "Real-time data updates",
+        "Form validation",
+        "Success/error messaging"
+      ]
+    }
+  },
+  "styling_guidelines": {
+    "design_system": {
+      "colors": {
+        "primary": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        "secondary": "linear-gradient(135deg, #64748b 0%, #475569 100%)",
+        "background": "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+        "text_primary": "#1e293b",
+        "text_secondary": "#64748b",
+        "surface": "white",
+        "border": "#e2e8f0"
+      },
+      "typography": {
+        "font_family": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        "heading_sizes": {
+          "h1": "28px",
+          "h2": "24px", 
+          "h3": "18px"
+        },
+        "body_size": "14px",
+        "line_height": "1.6"
+      },
+      "spacing": {
+        "grid_gap": "30px",
+        "card_padding": "20px",
+        "component_margin": "16px"
+      },
+      "shadows": {
+        "card": "0 4px 20px rgba(0,0,0,0.08)",
+        "card_hover": "0 8px 30px rgba(0,0,0,0.12)",
+        "modal": "0 20px 60px rgba(0,0,0,0.3)"
+      },
+      "border_radius": {
+        "card": "12px",
+        "button": "6px",
+        "input": "6px"
+      }
+    },
+    "responsive_breakpoints": {
+      "mobile": "320px",
+      "tablet": "768px", 
+      "desktop": "1024px",
+      "large": "1200px"
+    },
+    "animations": {
+      "product_expand": {
+        "name": "slideDown",
+        "duration": "0.3s", 
+        "easing": "ease-out"
+      },
+      "hover_effects": {
+        "duration": "0.2s",
+        "easing": "ease-in-out"
+      }
+    }
+  },
+  "testing_requirements": {
+    "coverage_target": "80%",
+    "frameworks": {
+      "unit": "Vitest + React Testing Library",
+      "integration": "Vitest + MSW",
+      "e2e": "Playwright or Cypress"
+    },
+    "test_scenarios": {
+      "unit_tests": [
+        "Component rendering with props",
+        "User interaction handling",
+        "State management",
+        "API service functions",
+        "Utility functions"
+      ],
+      "integration_tests": [
+        "Full admin workflow (add/edit/delete)",
+        "API endpoint integration", 
+        "Data flow between components",
+        "Error handling across boundaries"
+      ],
+      "e2e_tests": [
+        "Complete content management workflow",
+        "Customer product discovery journey",
+        "Mobile responsive behavior", 
+        "Cross-browser compatibility"
+      ]
+    },
+    "performance_tests": [
+      "Page load time < 2s on 3G",
+      "API response time < 200ms",
+      "Bundle size < 1MB",
+      "Lighthouse score > 90"
+    ],
+    "accessibility_tests": [
+      "WCAG 2.1 AA compliance",
+      "Keyboard navigation",
+      "Screen reader compatibility",
+      "Color contrast ratios"
+    ]
+  },
+  "deployment_config": {
+    "environments": {
+      "development": {
+        "frontend_port": 3000,
+        "backend_port": 3001,
+        "data_storage": "local JSON files",
+        "cors_origin": "http://localhost:3000"
+      },
+      "staging": {
+        "frontend": "staging.moneybox.com/products",
+        "backend": "staging-api.moneybox.com", 
+        "data_storage": "staging database",
+        "monitoring": "enabled"
+      },
+      "production": {
+        "frontend": "moneybox.com/products",
+        "backend": "api.moneybox.com",
+        "data_storage": "production database",
+        "cdn": "enabled",
+        "monitoring": "comprehensive"
+      }
+    },
+    "build_process": {
+      "frontend": [
+        "npm run build",
+        "vite build optimization",
+        "asset compression",
+        "deployment to CDN"
+      ],
+      "backend": [
+        "dependency installation",
+        "environment configuration",
+        "health check setup", 
+        "deployment to hosting service"
+      ]
+    }
+  },
+  "quality_gates": {
+    "code_quality": [
+      "ESLint passes with no errors",
+      "Prettier formatting applied",
+      "No console.log statements in production",
+      "TypeScript compilation (if applicable)"
+    ],
+    "testing": [
+      "All tests passing",
+      "Coverage above 80%",
+      "No flaky tests",
+      "E2E tests passing"
+    ],
+    "performance": [
+      "Bundle size under 1MB",
+      "Lighthouse performance > 90", 
+      "API response times < 200ms",
+      "No memory leaks detected"
+    ],
+    "security": [
+      "Input validation implemented",
+      "XSS protection enabled",
+      "CORS properly configured",
+      "No sensitive data in client code"
+    ]
+  },
+  "success_metrics": {
+    "business_kpis": [
+      {
+        "name": "Content Update Time",
+        "target": "< 5 minutes",
+        "measurement": "Time from request to completion"
+      },
+      {
+        "name": "Developer Time Reduction",
+        "target": "90% reduction",
+        "measurement": "Sprint capacity tracking"
+      },
+      {
+        "name": "Product Discovery Rate", 
+        "target": "40% increase",
+        "measurement": "Analytics page views"
+      }
+    ],
+    "technical_kpis": [
+      {
+        "name": "API Uptime",
+        "target": "99.95%",
+        "measurement": "Application monitoring"
+      },
+      {
+        "name": "Page Load Time",
+        "target": "< 2 seconds",
+        "measurement": "Real user monitoring"
+      },
+      {
+        "name": "Mobile Performance",
+        "target": "Lighthouse > 90",
+        "measurement": "Automated testing"
+      }
+    ]
+  },
+  "constraints_and_assumptions": {
+    "technical_constraints": [
+      "Must work in browsers without JavaScript disabled",
+      "Bundle size must remain under 1MB",
+      "API must handle 1000+ concurrent requests",
+      "Must be accessible (WCAG 2.1 AA)",
+      "Must work on mobile devices 320px+"
+    ],
+    "business_constraints": [
+      "MVP delivered within 3-hour constraint (completed)",
+      "Must align with Moneybox brand guidelines",
+      "Must pass financial services compliance review",
+      "Development within allocated budget",
+      "Limited to available team capacity"
+    ],
+    "assumptions": [
+      "Business users have basic computer literacy",
+      "Internet connection available for API calls",
+      "Modern browser usage (90%+ of traffic)",
+      "Content will be primarily in English",
+      "Admin access limited to internal users"
+    ]
+  }
+}
