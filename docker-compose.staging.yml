@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "3000:80"
+    environment:
+      - NODE_ENV=staging
+      - VITE_API_URL=http://localhost:3002/api
+    depends_on:
+      - backend
+    networks:
+      - moneybox-staging
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "3002:3002"
+    env_file:
+      - config/staging.env
+    volumes:
+      - staging-data:/app/server/data
+      - staging-uploads:/app/server/uploads
+    networks:
+      - moneybox-staging
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - moneybox-staging
+
+networks:
+  moneybox-staging:
+    driver: bridge
+
+volumes:
+  staging-data:
+  staging-uploads:
