@@ -48,6 +48,7 @@
     "concurrently": "^8.2.0",
     "jsdom": "^26.1.0",
     "rollup-plugin-visualizer": "^6.0.3",
+    "terser": "^5.43.1",
     "vite": "^4.4.5",
     "vitest": "^0.34.0"
   }
