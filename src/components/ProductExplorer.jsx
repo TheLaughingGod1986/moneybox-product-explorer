@@ -10,16 +10,50 @@ import ImageUploader from './ImageUploader.jsx';
 import ImageGallery from './ImageGallery.jsx';
 
 const ProductCard = ({ product, isExpanded, onToggle }) => {
+  // Map product names to their corresponding SVG icons
+  const getProductIcon = (productName) => {
+    const name = productName.toLowerCase();
+    if (name.includes('cash isa')) return '/images/icons/cash_isa.svg';
+    if (name.includes('stocks & shares isa') || name.includes('stocks and shares isa')) return '/images/icons/stocks_shares_isa.svg';
+    if (name.includes('lifetime isa')) return '/images/icons/lifetime_isa.svg';
+    if (name.includes('junior isa')) return '/images/icons/junior_isa.svg';
+    if (name.includes('personal pension')) return '/images/icons/personal_pension.svg';
+    if (name.includes('simple saver')) return '/images/icons/simple_saver.svg';
+    if (name.includes('32 day notice')) return '/images/icons/32_day_notice.svg';
+    if (name.includes('95 day notice')) return '/images/icons/95_day_notice.svg';
+    if (name.includes('general investment account')) return '/images/icons/general_investment_account.svg';
+    if (name.includes('open access cash isa')) return '/images/icons/open_access_cash_isa.svg';
+    return '/images/icons/cash_isa.svg'; // default fallback
+  };
+
+  // Check if the product has an emoji icon (old format) or should use SVG
+  const shouldUseEmoji = product.icon && product.icon.length <= 2 && /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/u.test(product.icon);
+  
+  // Get the correct icon path for the product
+  const getIconPath = (productIcon) => {
+    if (shouldUseEmoji) return null; // Use emoji instead
+    if (productIcon && productIcon.includes('_')) {
+      return `/images/icons/${productIcon}.svg`;
+    }
+    return getProductIcon(product.name); // Fallback to name-based mapping
+  };
+
   return (
     <div className="product-card">
       <div className="product-header" onClick={onToggle}>
-        <span className="product-name">{product.name}</span>
+        <span className="product-name">
+          {product.name}
+        </span>
         {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
       </div>
       {isExpanded && (
-        <div className="product-content">
+        <div className="product-content expanded">
           <div className="product-details">
-            <div className="product-icon">{product.icon}</div>
+            {shouldUseEmoji ? (
+              <span className="product-icon">{product.icon}</span>
+            ) : (
+              <img src={getIconPath(product.icon)} alt="" className="product-icon" />
+            )}
             <div 
               className="product-description"
               dangerouslySetInnerHTML={{ __html: product.description }}
@@ -35,7 +69,9 @@ const CategoryCard = ({ category, expandedProducts, onProductToggle, onEdit, onD
   return (
     <div className="category-card">
       <div className="category-header">
-        <h3 className="category-title">{category.name}</h3>
+        <h3 className="category-title">
+          {category.name}
+        </h3>
         {isAdmin && (
           <div className="admin-actions">
             <button onClick={() => onEdit(category)} className="admin-btn">
@@ -63,7 +99,7 @@ const CategoryCard = ({ category, expandedProducts, onProductToggle, onEdit, onD
 
 const AdminPanel = ({ data, onDataUpdate, onClose }) => {
   const [newCategoryName, setNewCategoryName] = useState('');
-  const [newProductData, setNewProductData] = useState({ name: '', description: '', icon: '💼' });
+  const [newProductData, setNewProductData] = useState({ name: '', description: '', icon: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [bulkMode, setBulkMode] = useState(false);
@@ -118,7 +154,7 @@ const AdminPanel = ({ data, onDataUpdate, onClose }) => {
         categoryId,
         ...newProductData
       });
-      setNewProductData({ name: '', description: '', icon: '💼' });
+      setNewProductData({ name: '', description: '', icon: '' });
       onDataUpdate(); // Trigger refresh
     } catch (err) {
       setError('Failed to create product: ' + err.message);
@@ -399,14 +435,24 @@ const AdminPanel = ({ data, onDataUpdate, onClose }) => {
                     className="admin-input"
                     style={{ flex: '2' }}
                   />
-                  <input
-                    type="text"
-                    placeholder="Icon (emoji)"
+                  <select
                     value={newProductData.icon}
                     onChange={(e) => setNewProductData({...newProductData, icon: e.target.value})}
                     className="admin-input"
-                    style={{ flex: '0 0 80px' }}
-                  />
+                    style={{ flex: '0 0 120px' }}
+                  >
+                    <option value="">Select Icon</option>
+                    <option value="cash_isa">Cash ISA</option>
+                    <option value="stocks_shares_isa">Stocks & Shares ISA</option>
+                    <option value="lifetime_isa">Lifetime ISA</option>
+                    <option value="junior_isa">Junior ISA</option>
+                    <option value="personal_pension">Personal Pension</option>
+                    <option value="simple_saver">Simple Saver</option>
+                    <option value="32_day_notice">32 Day Notice</option>
+                    <option value="95_day_notice">95 Day Notice</option>
+                    <option value="general_investment_account">General Investment Account</option>
+                    <option value="open_access_cash_isa">Open Access Cash ISA</option>
+                  </select>
                 </div>
                 <div className="rich-text-section">
                   <label className="editor-label">Product Description</label>
@@ -603,80 +649,354 @@ const ProductExplorer = () => {
     return [prev, current, next];
   };
 
+  // Category edit and delete handlers
+  const handleCategoryEdit = (category) => {
+    // For now, show an alert. We can enhance this later with a proper edit modal
+    alert(`Edit category: ${category.name}\n\nThis feature will be enhanced with a proper edit modal in the future.`);
+  };
+
+  const handleCategoryDelete = async (categoryId) => {
+    if (!confirm('Are you sure you want to delete this category? This action cannot be undone.')) {
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      await apiService.deleteCategory(categoryId);
+      await fetchData(); // Refresh the data
+    } catch (err) {
+      setError('Failed to delete category: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="app">
       <style>{`
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; }
-        .app { min-height: 100vh; padding: 20px; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px 12px 0 0; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.1); position: relative; }
-        .header h1 { font-size: 28px; font-weight: 300; letter-spacing: 1px; }
-        .admin-toggle { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
-        .admin-toggle:hover { background: rgba(255,255,255,0.3); }
-        .main-container { background: white; border-radius: 0 0 12px 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); overflow: hidden; }
-        .navigation-header { background: #f8fafc; padding: 30px 20px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #e2e8f0; }
-        .nav-button { background: #64748b; color: white; border: none; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; margin: 0 20px; }
-        .nav-button:hover { background: #475569; transform: translateY(-1px); }
-        .nav-title { font-size: 24px; font-weight: 600; color: #1e293b; margin: 0 40px; }
-        .categories-container { padding: 40px 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto; }
-        .category-card { background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; border: 1px solid #e2e8f0; }
-        .category-card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
-        .category-header { background: linear-gradient(135deg, #64748b 0%, #475569 100%); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .category-title { font-size: 18px; font-weight: 600; letter-spacing: 0.5px; }
+        
+        :root {
+          --teal: #78E3DF;
+          --dark-green: #022828;
+          --seafoam: #E9F1EF;
+          --light-teal: #A5EEEB;
+          --border-color: rgba(0, 194, 180, 0.32);
+        }
+        
+        body { 
+          font-family: 'Orla Sprig Sans', BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', Arial, sans-serif; 
+          background: white; 
+          min-height: 100vh; 
+          font-size: 18px;
+          line-height: 1.4;
+          color: var(--dark-green);
+        }
+        
+        .app { 
+          min-height: 100vh; 
+          background: #f0f0f0;
+        }
+        
+        .header { 
+          background: #333; 
+          color: white; 
+          padding: 26px 0; 
+          border-bottom: 1px solid #555;
+          position: relative; 
+          margin-bottom: 0;
+        }
+        
+        .header-content {
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 0 26px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        
+        .logo { height: 40px; width: auto; }
+        
+        .admin-toggle { 
+          background: #555; 
+          border: 1px solid #777; 
+          color: white; 
+          padding: 8px 16px; 
+          border-radius: 28px; 
+          cursor: pointer; 
+          transition: all 0.2s ease-out; 
+          font-size: 16px;
+          font-weight: 500;
+          text-decoration: none;
+          line-height: 50px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        
+        .admin-toggle:hover { 
+          background: #666; 
+          border-color: #888; 
+        }
+        
+        .main-container { 
+          background: #f0f0f0; 
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 0 26px;
+        }
+        
+        .navigation-header { 
+          background: #f0f0f0; 
+          padding: 32px 0; 
+          display: flex; 
+          align-items: center; 
+          justify-content: center; 
+          border-bottom: 1px solid #ddd; 
+        }
+        
+        .nav-button { 
+          background: #333; 
+          color: white; 
+          border: 1px solid #555; 
+          width: 40px; 
+          height: 40px; 
+          border-radius: 50%; 
+          display: flex; 
+          align-items: center; 
+          justify-content: center; 
+          cursor: pointer; 
+          transition: all 0.2s ease-out; 
+          margin: 0 16px; 
+        }
+        
+        .nav-button:hover { 
+          background: #444; 
+          border-color: #666; 
+        }
+        
+        .nav-title { 
+          font-family: 'Orla Sprig Sans';
+          font-size: 32px; 
+          font-weight: 500; 
+          color: #333; 
+          margin: 0 24px; 
+          letter-spacing: 0; 
+          line-height: 1;
+          text-align: center;
+        }
+        
+        .categories-container { 
+          padding: 64px 0; 
+          display: grid; 
+          grid-template-columns: repeat(3, 1fr); 
+          gap: 48px; 
+          max-width: 1400px; 
+          margin: 0 auto; 
+        }
+        
+        .category-card { 
+          background: #333; 
+          border: 1px solid #555; 
+          border-radius: 8px; 
+          overflow: hidden; 
+          transition: all 0.2s ease; 
+          padding: 0;
+        }
+        
+        .category-card:hover { 
+          background: #444; 
+          border-color: #666; 
+        }
+        
+        .category-header { 
+          background: #333; 
+          color: white; 
+          padding: 24px; 
+          display: flex; 
+          justify-content: space-between; 
+          align-items: center; 
+          margin-bottom: 0;
+          border-bottom: 1px solid #555;
+        }
+        
+        .category-title { 
+          font-family: 'Orla Sprig Sans';
+          font-size: 24px; 
+          font-weight: 500; 
+          letter-spacing: 0; 
+          color: white;
+          text-align: center;
+          width: 100%;
+        }
+        
         .admin-actions { display: flex; gap: 8px; }
-        .admin-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px; border-radius: 4px; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: center; }
-        .admin-btn:hover { background: rgba(255,255,255,0.3); }
-        .admin-btn.delete:hover { background: rgba(239,68,68,0.8); }
-        .admin-btn.primary { background: #3b82f6; color: white; padding: 8px 16px; font-size: 14px; }
-        .admin-btn.primary:hover { background: #2563eb; }
-        .products-list { padding: 0; }
-        .product-card { border-bottom: 1px solid #f1f5f9; }
-        .product-card:last-child { border-bottom: none; }
-        .product-header { padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.2s; background: white; }
-        .product-header:hover { background: #f8fafc; }
-        .product-name { font-weight: 500; color: #1e293b; font-size: 15px; }
-        .product-content { background: #f8fafc; animation: slideDown 0.3s ease-out; overflow: hidden; }
-        @keyframes slideDown { from { max-height: 0; opacity: 0; } to { max-height: 200px; opacity: 1; } }
-        .product-details { padding: 20px; display: flex; gap: 16px; align-items: flex-start; }
-        .product-icon { font-size: 32px; min-width: 50px; text-align: center; }
-        .product-description { font-size: 14px; line-height: 1.6; color: #64748b; flex: 1; }
-        .product-description p { margin: 0 0 8px 0; }
+        
+        .admin-btn { 
+          background: #555; 
+          border: 1px solid #777; 
+          color: white; 
+          padding: 8px 16px; 
+          border-radius: 28px; 
+          cursor: pointer; 
+          transition: all 0.2s ease-out; 
+          display: flex; 
+          align-items: center; 
+          justify-content: center; 
+          font-size: 16px;
+          font-weight: 500;
+          text-decoration: none;
+          line-height: 50px;
+        }
+        
+        .admin-btn:hover { 
+          background: #666; 
+          border-color: #888; 
+        }
+        
+        .admin-btn.delete:hover { 
+          background: rgba(239,68,68,0.8); 
+        }
+        
+        .admin-btn.primary { 
+          background: var(--teal); 
+          color: var(--dark-green); 
+          padding: 8px 16px; 
+          font-size: 16px; 
+        }
+        
+        .admin-btn.primary:hover { 
+          color: var(--teal); 
+          background: var(--dark-green); 
+        }
+        
+        .products-list { 
+          padding: 24px; 
+          background: #333;
+        }
+        
+        .product-card { 
+          background: #f0f0f0; 
+          border: 1px solid #ddd; 
+          border-radius: 6px; 
+          padding: 0; 
+          margin-bottom: 12px; 
+          transition: all 0.2s ease; 
+          cursor: pointer;
+          overflow: hidden;
+        }
+        
+        .product-card:hover { 
+          background: #e8e8e8; 
+          border-color: #ccc; 
+        }
+        
+        .product-header { 
+          padding: 16px 20px; 
+          display: flex; 
+          justify-content: space-between; 
+          align-items: center; 
+          cursor: pointer; 
+          transition: all 0.2s; 
+          background: #f0f0f0; 
+          margin-bottom: 0;
+        }
+        
+        .product-name { 
+          font-family: 'Orla Sprig Sans';
+          font-weight: 500; 
+          color: #333; 
+          font-size: 20px; 
+          letter-spacing: 0; 
+        }
+        
+        .product-content { 
+          background: #f0f0f0; 
+          animation: slideDown 0.35s ease; 
+          overflow: hidden; 
+          border-top: 1px solid #ddd; 
+        }
+        
+        @keyframes slideDown { 
+          from { 
+            max-height: 0; 
+            opacity: 0; 
+            transform: translateY(-10px); 
+          } 
+          to { 
+            max-height: 500px; 
+            opacity: 1; 
+            transform: translateY(0); 
+          } 
+        }
+        
+        .product-details { 
+          padding: 20px; 
+          display: flex; 
+          gap: 16px; 
+          align-items: flex-start; 
+        }
+        
+        .product-icon { 
+          width: 48px; 
+          height: 48px; 
+          margin-right: 0;
+          flex-shrink: 0;
+          font-size: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        .product-description { 
+          font-size: 16px; 
+          line-height: 1.6; 
+          color: var(--dark-green); 
+          flex: 1; 
+        }
+        
+        .product-description p { margin: 0 0 16px 0; }
         .product-description p:last-child { margin-bottom: 0; }
-        .product-description ul, .product-description ol { margin: 8px 0; padding-left: 20px; }
-        .product-description li { margin: 4px 0; }
-        .product-description a { color: #667eea; text-decoration: underline; }
-        .product-description strong { font-weight: 600; }
+        .product-description ul, .product-description ol { margin: 16px 0; padding-left: 24px; }
+        .product-description li { margin: 8px 0; }
+        .product-description a { color: var(--dark-green); text-decoration: underline; font-weight: 500; }
+        .product-description a:hover { color: var(--teal); }
+        .product-description strong { font-weight: bold; color: var(--dark-green); }
+        
         .admin-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
         .admin-panel { background: white; border-radius: 12px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-        .admin-header { background: #1e293b; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .admin-header { background: var(--dark-green); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
         .header-actions { display: flex; align-items: center; gap: 12px; }
         .preview-toggle-btn, .bulk-toggle-btn { padding: 8px 16px; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
         .preview-toggle-btn:hover, .bulk-toggle-btn:hover { background: rgba(255,255,255,0.3); }
-        .preview-toggle-btn.active { background: #667eea; }
-        .bulk-toggle-btn.active { background: #10b981; }
+        .preview-toggle-btn.active { background: var(--teal); color: var(--dark-green); }
+        .bulk-toggle-btn.active { background: var(--teal); color: var(--dark-green); }
         .close-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 4px; }
         .admin-section { padding: 24px; border-bottom: 1px solid #e2e8f0; }
-        .admin-section h3 { margin-bottom: 16px; color: #1e293b; }
+        .admin-section h3 { margin-bottom: 16px; color: var(--dark-green); font-family: 'Orla Sprig Sans'; }
         .form-group { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
         .admin-input { padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; flex: 1; min-width: 200px; }
         .admin-input.small { min-width: 150px; }
         .admin-input.tiny { min-width: 60px; max-width: 80px; }
-        .admin-category { background: #f8fafc; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+        .admin-category { background: var(--seafoam); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
         .admin-category-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .add-product-section { display: flex; flex-direction: column; gap: 16px; margin-bottom: 12px; }
         .product-form-row { display: flex; gap: 12px; align-items: center; }
         .rich-text-section { display: flex; flex-direction: column; gap: 8px; }
-        .editor-label { font-size: 14px; font-weight: 500; color: #374151; }
+        .editor-label { font-size: 14px; font-weight: 500; color: var(--dark-green); }
         .form-actions { display: flex; gap: 8px; align-items: center; }
         .image-section { display: flex; flex-direction: column; gap: 8px; }
         .image-actions { display: flex; gap: 8px; margin-top: 8px; }
         .products-admin-section { margin-top: 16px; }
         .section-header { margin-bottom: 12px; }
-        .section-header h4 { margin: 0; font-size: 14px; color: #374151; font-weight: 500; }
+        .section-header h4 { margin: 0; font-size: 14px; color: var(--dark-green); font-weight: 500; }
         .draggable-product-item { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .product-info { display: flex; align-items: center; gap: 8px; flex: 1; }
         .product-icon { font-size: 16px; }
-        .product-name { font-weight: 500; color: #1e293b; flex: 1; }
+        .product-name { font-weight: 500; color: var(--dark-green); flex: 1; }
         .product-order { font-size: 12px; color: #64748b; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; }
         .empty-products { text-align: center; padding: 20px; color: #64748b; font-style: italic; }
         .loading-message { text-align: center; padding: 40px; font-size: 16px; color: #64748b; }
@@ -684,10 +1004,42 @@ const ProductExplorer = () => {
         .retry-btn { background: #dc2626; color: white; border: none; padding: 8px 16px; border-radius: 4px; margin-left: 12px; cursor: pointer; }
         .retry-btn:hover { background: #b91c1c; }
         .admin-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        
+        @media (max-width: 1400px) {
+          .categories-container { 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 32px; 
+            padding: 64px 26px; 
+          }
+        }
+        
+        @media (max-width: 1024px) {
+          .categories-container { 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 32px; 
+            padding: 64px 26px; 
+          }
+        }
+        
         @media (max-width: 768px) {
-          .categories-container { grid-template-columns: 1fr; gap: 20px; padding: 20px; }
-          .navigation-header { padding: 20px; }
-          .nav-title { font-size: 20px; margin: 0 20px; }
+          .app { padding: 0; }
+          .header-content { padding: 0 20px; }
+          .main-container { padding: 0 20px; }
+          .categories-container { 
+            grid-template-columns: 1fr; 
+            gap: 24px; 
+            padding: 32px 0; 
+          }
+          .navigation-header { padding: 32px 0 24px 0; }
+          .nav-title { font-size: 32px; margin: 0 20px; }
+          .nav-button { width: 44px; height: 44px; }
+          .category-header { padding: 24px; }
+          .category-title { font-size: 20px; }
+          .products-list { padding: 24px; }
+          .product-header { padding: 20px; }
+          .product-details { padding: 24px; gap: 16px; }
+          .admin-toggle { padding: 8px 12px; font-size: 14px; }
+          .logo { height: 32px; }
           .form-group { flex-direction: column; align-items: stretch; }
           .admin-input { min-width: auto; }
           .add-product-section { flex-direction: column; align-items: stretch; }
@@ -695,14 +1047,17 @@ const ProductExplorer = () => {
       `}</style>
       
       <div className="header">
-        <h1>Moneybox</h1>
-        <button 
-          className="admin-toggle"
-          onClick={() => setIsAdmin(!isAdmin)}
-          title="Toggle Admin Mode"
-        >
-          <Settings size={16} />
-        </button>
+        <div className="header-content">
+          <img src="/images/logos/MB-logo-400x92-1.svg" alt="Moneybox" className="logo" />
+          <button 
+            className="admin-toggle"
+            onClick={() => setIsAdmin(!isAdmin)}
+            title="Toggle Admin Mode"
+          >
+            <Settings size={16} />
+            Admin
+          </button>
+        </div>
       </div>
       
       <div className="main-container">
@@ -741,8 +1096,8 @@ const ProductExplorer = () => {
                 category={category}
                 expandedProducts={expandedProducts}
                 onProductToggle={handleProductToggle}
-                onEdit={() => {}}
-                onDelete={() => {}}
+                onEdit={handleCategoryEdit}
+                onDelete={handleCategoryDelete}
                 isAdmin={isAdmin}
               />
             ))
