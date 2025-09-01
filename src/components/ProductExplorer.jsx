@@ -65,7 +65,7 @@ const ProductCard = ({ product, isExpanded, onToggle }) => {
   );
 };
 
-const CategoryCard = ({ category, expandedProducts, onProductToggle, onEdit, onDelete, isAdmin }) => {
+const CategoryCard = ({ category, expandedProducts, onProductToggle, onDelete, isAdmin }) => {
   return (
     <div className="category-card">
       <div className="category-header">
@@ -74,9 +74,6 @@ const CategoryCard = ({ category, expandedProducts, onProductToggle, onEdit, onD
         </h3>
         {isAdmin && (
           <div className="admin-actions">
-            <button onClick={() => onEdit(category)} className="admin-btn">
-              <Edit size={14} />
-            </button>
             <button onClick={() => onDelete(category.id)} className="admin-btn delete">
               <Trash2 size={14} />
             </button>
@@ -649,12 +646,7 @@ const ProductExplorer = () => {
     return [prev, current, next];
   };
 
-  // Category edit and delete handlers
-  const handleCategoryEdit = (category) => {
-    // For now, show an alert. We can enhance this later with a proper edit modal
-    alert(`Edit category: ${category.name}\n\nThis feature will be enhanced with a proper edit modal in the future.`);
-  };
-
+  // Category delete handler
   const handleCategoryDelete = async (categoryId) => {
     if (!confirm('Are you sure you want to delete this category? This action cannot be undone.')) {
       return;
@@ -679,11 +671,11 @@ const ProductExplorer = () => {
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
-          --teal: #78E3DF;
+          --teal: #00c2b5;
           --dark-green: #022828;
-          --seafoam: #E9F1EF;
-          --light-teal: #A5EEEB;
-          --border-color: rgba(0, 194, 180, 0.32);
+          --seafoam: #f8f9fa;
+          --light-teal: #78e3df;
+          --border-color: rgba(0, 194, 181, 0.15);
         }
         
         body { 
@@ -697,14 +689,14 @@ const ProductExplorer = () => {
         
         .app { 
           min-height: 100vh; 
-          background: #f0f0f0;
+          background: var(--seafoam);
         }
         
         .header { 
-          background: #333; 
+          background: var(--dark-green); 
           color: white; 
           padding: 26px 0; 
-          border-bottom: 1px solid #555;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
           position: relative; 
           margin-bottom: 0;
         }
@@ -721,9 +713,9 @@ const ProductExplorer = () => {
         .logo { height: 40px; width: auto; }
         
         .admin-toggle { 
-          background: #555; 
-          border: 1px solid #777; 
-          color: white; 
+          background: var(--teal); 
+          border: 1px solid var(--teal); 
+          color: var(--dark-green); 
           padding: 8px 16px; 
           border-radius: 28px; 
           cursor: pointer; 
@@ -738,30 +730,30 @@ const ProductExplorer = () => {
         }
         
         .admin-toggle:hover { 
-          background: #666; 
-          border-color: #888; 
+          background: var(--light-teal); 
+          border-color: var(--light-teal); 
         }
         
         .main-container { 
-          background: #f0f0f0; 
+          background: var(--seafoam); 
           max-width: 1400px;
           margin: 0 auto;
           padding: 0 26px;
         }
         
         .navigation-header { 
-          background: #f0f0f0; 
+          background: var(--seafoam); 
           padding: 32px 0; 
           display: flex; 
           align-items: center; 
           justify-content: center; 
-          border-bottom: 1px solid #ddd; 
+          border-bottom: 1px solid rgba(0, 0, 0, 0.1); 
         }
         
         .nav-button { 
-          background: #333; 
-          color: white; 
-          border: 1px solid #555; 
+          background: white; 
+          color: var(--dark-green); 
+          border: 1px solid rgba(0, 0, 0, 0.1); 
           width: 40px; 
           height: 40px; 
           border-radius: 50%; 
@@ -774,15 +766,16 @@ const ProductExplorer = () => {
         }
         
         .nav-button:hover { 
-          background: #444; 
-          border-color: #666; 
+          background: var(--teal); 
+          border-color: var(--teal); 
+          color: white; 
         }
         
         .nav-title { 
           font-family: 'Orla Sprig Sans';
           font-size: 32px; 
           font-weight: 500; 
-          color: #333; 
+          color: var(--dark-green); 
           margin: 0 24px; 
           letter-spacing: 0; 
           line-height: 1;
@@ -799,28 +792,28 @@ const ProductExplorer = () => {
         }
         
         .category-card { 
-          background: #333; 
-          border: 1px solid #555; 
-          border-radius: 8px; 
+          background: var(--teal); 
+          border: 1px solid var(--teal); 
+          border-radius: 12px; 
           overflow: hidden; 
           transition: all 0.2s ease; 
           padding: 0;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
         
         .category-card:hover { 
-          background: #444; 
-          border-color: #666; 
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15); 
         }
         
         .category-header { 
-          background: #333; 
+          background: var(--teal); 
           color: white; 
           padding: 24px; 
           display: flex; 
           justify-content: space-between; 
           align-items: center; 
           margin-bottom: 0;
-          border-bottom: 1px solid #555;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .category-title { 
@@ -836,8 +829,8 @@ const ProductExplorer = () => {
         .admin-actions { display: flex; gap: 8px; }
         
         .admin-btn { 
-          background: #555; 
-          border: 1px solid #777; 
+          background: rgba(255, 255, 255, 0.1); 
+          border: 1px solid rgba(255, 255, 255, 0.2); 
           color: white; 
           padding: 8px 16px; 
           border-radius: 28px; 
@@ -853,8 +846,8 @@ const ProductExplorer = () => {
         }
         
         .admin-btn:hover { 
-          background: #666; 
-          border-color: #888; 
+          background: rgba(255, 255, 255, 0.2); 
+          border-color: rgba(255, 255, 255, 0.3); 
         }
         
         .admin-btn.delete:hover { 
@@ -875,13 +868,13 @@ const ProductExplorer = () => {
         
         .products-list { 
           padding: 24px; 
-          background: #333;
+          background: var(--teal);
         }
         
         .product-card { 
-          background: #f0f0f0; 
-          border: 1px solid #ddd; 
-          border-radius: 6px; 
+          background: white; 
+          border: 1px solid rgba(0, 0, 0, 0.1); 
+          border-radius: 8px; 
           padding: 0; 
           margin-bottom: 12px; 
           transition: all 0.2s ease; 
@@ -890,8 +883,8 @@ const ProductExplorer = () => {
         }
         
         .product-card:hover { 
-          background: #e8e8e8; 
-          border-color: #ccc; 
+          border-color: rgba(0, 0, 0, 0.2); 
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); 
         }
         
         .product-header { 
@@ -901,23 +894,23 @@ const ProductExplorer = () => {
           align-items: center; 
           cursor: pointer; 
           transition: all 0.2s; 
-          background: #f0f0f0; 
+          background: white; 
           margin-bottom: 0;
         }
         
         .product-name { 
           font-family: 'Orla Sprig Sans';
           font-weight: 500; 
-          color: #333; 
+          color: var(--dark-green); 
           font-size: 20px; 
           letter-spacing: 0; 
         }
         
         .product-content { 
-          background: #f0f0f0; 
+          background: white; 
           animation: slideDown 0.35s ease; 
           overflow: hidden; 
-          border-top: 1px solid #ddd; 
+          border-top: 1px solid rgba(0, 0, 0, 0.1); 
         }
         
         @keyframes slideDown { 
@@ -1096,7 +1089,6 @@ const ProductExplorer = () => {
                 category={category}
                 expandedProducts={expandedProducts}
                 onProductToggle={handleProductToggle}
-                onEdit={handleCategoryEdit}
                 onDelete={handleCategoryDelete}
                 isAdmin={isAdmin}
               />
