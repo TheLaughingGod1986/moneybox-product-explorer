@@ -76,7 +76,9 @@ const strictLimiter = rateLimit({
 // Basic middleware
 app.use(cors());
 app.use(express.json({ limit: '10mb' })); // Limit JSON payload size
+// Static file serving
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/images', express.static(path.join(__dirname, '..', 'public', 'images')));
 
 // Apply rate limiting
 app.use('/api/', limiter);

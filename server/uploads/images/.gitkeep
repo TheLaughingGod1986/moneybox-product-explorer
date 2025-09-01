@@ -1,0 +1,21 @@
+# User Uploaded Images Directory
+
+This directory stores images uploaded by users through the admin interface.
+
+## Usage
+- User-uploaded product images and category images
+- Processed and optimized by the image upload system
+- Automatic compression and resizing applied
+- Served via API endpoints with proper caching headers
+
+## Features
+- Automatic image optimization (60% compression)
+- Support for PNG, JPG, GIF, WebP formats
+- Drag & drop upload interface
+- Gallery management system
+- Thumbnail generation
+
+## API Access
+- Upload: POST /api/upload
+- Gallery: GET /api/images
+- Delete: DELETE /api/images/:filename
