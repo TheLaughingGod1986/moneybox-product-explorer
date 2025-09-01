@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Settings, Plus, Edit, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Settings, Plus, Edit, Trash2, Eye } from 'lucide-react';
 import { apiService } from '../services/api.js';
+import RichTextEditor from './RichTextEditor.jsx';
+import DraggableList from './DraggableList.jsx';
+import BulkActionsToolbar from './BulkActionsToolbar.jsx';
+import PreviewModal from './PreviewModal.jsx';
+import LivePreview from './LivePreview.jsx';
+import ImageUploader from './ImageUploader.jsx';
+import ImageGallery from './ImageGallery.jsx';
 
 const ProductCard = ({ product, isExpanded, onToggle }) => {
   return (
@@ -13,7 +20,10 @@ const ProductCard = ({ product, isExpanded, onToggle }) => {
         <div className="product-content">
           <div className="product-details">
             <div className="product-icon">{product.icon}</div>
-            <div className="product-description">{product.description}</div>
+            <div 
+              className="product-description"
+              dangerouslySetInnerHTML={{ __html: product.description }}
+            />
           </div>
         </div>
       )}
@@ -56,6 +66,13 @@ const AdminPanel = ({ data, onDataUpdate, onClose }) => {
   const [newProductData, setNewProductData] = useState({ name: '', description: '', icon: '💼' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [bulkMode, setBulkMode] = useState(false);
+  const [selectedProducts, setSelectedProducts] = useState({});
+  const [previewModal, setPreviewModal] = useState({ isOpen: false, data: null });
+  const [livePreviewVisible, setLivePreviewVisible] = useState(false);
+  const [draftData, setDraftData] = useState({});
+  const [imageGalleryOpen, setImageGalleryOpen] = useState(false);
+  const [productImages, setProductImages] = useState([]);
 
   const addCategory = async () => {
     if (!newCategoryName.trim()) return;
@@ -110,12 +127,230 @@ const AdminPanel = ({ data, onDataUpdate, onClose }) => {
     }
   };
 
+  const handleProductReorder = async (categoryId, reorderedProducts) => {
+    setLoading(true);
+    setError('');
+    
+    try {
+      const productOrders = reorderedProducts.map((product, index) => ({
+        id: product.id,
+        order: index + 1
+      }));
+      
+      await apiService.reorderProducts(categoryId, productOrders);
+      onDataUpdate(); // Trigger refresh
+    } catch (err) {
+      setError('Failed to reorder products: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteProduct = async (productId) => {
+    if (!confirm('Are you sure you want to delete this product?')) return;
+    
+    setLoading(true);
+    setError('');
+    
+    try {
+      await apiService.deleteProduct(productId);
+      onDataUpdate(); // Trigger refresh
+    } catch (err) {
+      setError('Failed to delete product: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Bulk operation handlers
+  const handleBulkModeToggle = () => {
+    setBulkMode(!bulkMode);
+    if (bulkMode) {
+      setSelectedProducts({});
+    }
+  };
+
+  const handleSelectionChange = (categoryId, selectedIds) => {
+    setSelectedProducts(prev => ({
+      ...prev,
+      [categoryId]: selectedIds
+    }));
+  };
+
+  const getSelectedCount = (categoryId) => {
+    return selectedProducts[categoryId]?.length || 0;
+  };
+
+  const getAllSelectedProducts = () => {
+    const allSelected = [];
+    Object.entries(selectedProducts).forEach(([categoryId, productIds]) => {
+      productIds.forEach(productId => {
+        allSelected.push({ categoryId, productId });
+      });
+    });
+    return allSelected;
+  };
+
+  const handleBulkDelete = async (categoryId) => {
+    const selectedIds = selectedProducts[categoryId] || [];
+    if (selectedIds.length === 0) return;
+
+    setLoading(true);
+    setError('');
+
+    try {
+      await apiService.bulkOperation('delete', selectedIds);
+      setSelectedProducts(prev => ({ ...prev, [categoryId]: [] }));
+      onDataUpdate();
+    } catch (err) {
+      setError('Failed to delete products: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBulkMove = async (categoryId, targetCategoryId) => {
+    const selectedIds = selectedProducts[categoryId] || [];
+    if (selectedIds.length === 0) return;
+
+    setLoading(true);
+    setError('');
+
+    try {
+      await apiService.bulkOperation('move', selectedIds, { targetCategoryId });
+      setSelectedProducts(prev => ({ ...prev, [categoryId]: [] }));
+      onDataUpdate();
+    } catch (err) {
+      setError('Failed to move products: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBulkEdit = async (categoryId) => {
+    // For now, just show an alert. We can enhance this later with a bulk edit modal
+    alert('Bulk edit feature coming soon! Select individual products to edit them one by one.');
+  };
+
+  const clearSelection = (categoryId) => {
+    setSelectedProducts(prev => ({ ...prev, [categoryId]: [] }));
+  };
+
+  // Preview handlers
+  const openPreviewModal = (type, data) => {
+    setPreviewModal({
+      isOpen: true,
+      data: {
+        type,
+        ...data
+      }
+    });
+  };
+
+  const closePreviewModal = () => {
+    setPreviewModal({ isOpen: false, data: null });
+  };
+
+  const handlePreviewProduct = () => {
+    if (!newProductData.name.trim()) {
+      setError('Please enter a product name to preview');
+      return;
+    }
+
+    openPreviewModal('product', {
+      product: newProductData,
+      category: { name: 'Preview Category' }
+    });
+  };
+
+  const handlePublishFromPreview = async () => {
+    // This would normally publish the content
+    // For now, just close the modal and show success
+    setPreviewModal({ isOpen: false, data: null });
+    // You could add actual publish logic here
+  };
+
+  const handleSaveDraft = () => {
+    // Save current form data as draft
+    const draftKey = `draft_${Date.now()}`;
+    setDraftData(prev => ({
+      ...prev,
+      [draftKey]: {
+        ...newProductData,
+        savedAt: new Date().toISOString()
+      }
+    }));
+    
+    // Show confirmation or toast message
+    alert('Draft saved successfully!');
+  };
+
+  const toggleLivePreview = (visible) => {
+    setLivePreviewVisible(visible);
+  };
+
+  // Image handlers
+  const handleImageUpload = async (imageData) => {
+    try {
+      setLoading(true);
+      const response = await apiService.uploadImage(
+        imageData.url,
+        imageData.name,
+        imageData.type
+      );
+      
+      // Update the image with server URL
+      const uploadedImage = {
+        ...imageData,
+        url: response.data.url,
+        filename: response.data.filename
+      };
+      
+      setProductImages(prev => [...prev, uploadedImage]);
+      return uploadedImage;
+    } catch (err) {
+      setError('Failed to upload image: ' + err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleImageRemove = (imageId) => {
+    setProductImages(prev => prev.filter(img => img.id !== imageId));
+  };
+
+  const handleImageSelect = (image) => {
+    if (Array.isArray(image)) {
+      setProductImages(prev => [...prev, ...image]);
+    } else {
+      setProductImages(prev => [...prev, image]);
+    }
+    setImageGalleryOpen(false);
+  };
+
   return (
     <div className="admin-overlay">
       <div className="admin-panel">
         <div className="admin-header">
           <h2>Content Management</h2>
-          <button onClick={onClose} className="close-btn">×</button>
+          <div className="header-actions">
+            <button 
+              onClick={() => toggleLivePreview(!livePreviewVisible)}
+              className={`preview-toggle-btn ${livePreviewVisible ? 'active' : ''}`}
+              title="Toggle Live Preview"
+            >
+              <Eye size={16} />
+              {livePreviewVisible ? 'Hide Preview' : 'Live Preview'}
+            </button>
+            <button 
+              onClick={handleBulkModeToggle}
+              className={`bulk-toggle-btn ${bulkMode ? 'active' : ''}`}
+            >
+              {bulkMode ? 'Exit Bulk Mode' : 'Bulk Mode'}
+            </button>
+            <button onClick={onClose} className="close-btn">×</button>
+          </div>
         </div>
         
         <div className="admin-section">
@@ -155,46 +390,157 @@ const AdminPanel = ({ data, onDataUpdate, onClose }) => {
               </div>
               
               <div className="add-product-section">
-                <input
-                  type="text"
-                  placeholder="Product name"
-                  value={newProductData.name}
-                  onChange={(e) => setNewProductData({...newProductData, name: e.target.value})}
-                  className="admin-input small"
-                />
-                <input
-                  type="text"
-                  placeholder="Description"
-                  value={newProductData.description}
-                  onChange={(e) => setNewProductData({...newProductData, description: e.target.value})}
-                  className="admin-input small"
-                />
-                <input
-                  type="text"
-                  placeholder="Icon (emoji)"
-                  value={newProductData.icon}
-                  onChange={(e) => setNewProductData({...newProductData, icon: e.target.value})}
-                  className="admin-input tiny"
-                />
-                <button 
-                  onClick={() => addProduct(category.id)} 
-                  className="admin-btn primary"
-                >
-                  Add Product
-                </button>
+                <div className="product-form-row">
+                  <input
+                    type="text"
+                    placeholder="Product name"
+                    value={newProductData.name}
+                    onChange={(e) => setNewProductData({...newProductData, name: e.target.value})}
+                    className="admin-input"
+                    style={{ flex: '2' }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Icon (emoji)"
+                    value={newProductData.icon}
+                    onChange={(e) => setNewProductData({...newProductData, icon: e.target.value})}
+                    className="admin-input"
+                    style={{ flex: '0 0 80px' }}
+                  />
+                </div>
+                <div className="rich-text-section">
+                  <label className="editor-label">Product Description</label>
+                  <RichTextEditor
+                    value={newProductData.description}
+                    onChange={(content) => setNewProductData({...newProductData, description: content})}
+                    placeholder="Enter a detailed product description..."
+                  />
+                </div>
+                
+                <div className="image-section">
+                  <label className="editor-label">Product Images</label>
+                  <ImageUploader
+                    onImageUpload={handleImageUpload}
+                    existingImages={productImages}
+                    onImageRemove={handleImageRemove}
+                    multiple={true}
+                    disabled={loading}
+                  />
+                  <div className="image-actions">
+                    <button 
+                      type="button"
+                      onClick={() => setImageGalleryOpen(true)}
+                      className="admin-btn secondary small"
+                      disabled={loading}
+                    >
+                      Browse Gallery
+                    </button>
+                  </div>
+                </div>
+                <div className="form-actions">
+                  <button 
+                    onClick={handlePreviewProduct}
+                    className="admin-btn secondary"
+                    disabled={!newProductData.name.trim()}
+                  >
+                    <Eye size={16} />
+                    Preview
+                  </button>
+                  <button 
+                    onClick={() => addProduct(category.id)} 
+                    className="admin-btn primary"
+                    disabled={!newProductData.name.trim()}
+                  >
+                    Add Product
+                  </button>
+                </div>
               </div>
               
-              <div className="products-admin-list">
-                {category.products.map(product => (
-                  <div key={product.id} className="product-admin-item">
-                    <span>{product.icon} {product.name}</span>
+              <div className="products-admin-section">
+                {category.products.length > 0 ? (
+                  <>
+                    {/* Bulk Actions Toolbar */}
+                    {bulkMode && getSelectedCount(category.id) > 0 && (
+                      <BulkActionsToolbar
+                        selectedCount={getSelectedCount(category.id)}
+                        onBulkEdit={() => handleBulkEdit(category.id)}
+                        onBulkDelete={() => handleBulkDelete(category.id)}
+                        onBulkMove={(targetCategoryId) => handleBulkMove(category.id, targetCategoryId)}
+                        onClearSelection={() => clearSelection(category.id)}
+                        categories={data.categories.filter(c => c.id !== category.id)}
+                        disabled={loading}
+                      />
+                    )}
+                    
+                    <div className="section-header">
+                      <h4>{bulkMode ? 'Select products:' : 'Drag to reorder products:'}</h4>
+                    </div>
+                    
+                    <DraggableList
+                      items={category.products.sort((a, b) => (a.order || 0) - (b.order || 0))}
+                      onReorder={bulkMode ? null : (reorderedProducts) => handleProductReorder(category.id, reorderedProducts)}
+                      keyExtractor={(product) => product.id}
+                      disabled={loading}
+                      selectable={bulkMode}
+                      selectedItems={selectedProducts[category.id] || []}
+                      onSelectionChange={(selectedIds) => handleSelectionChange(category.id, selectedIds)}
+                      renderItem={(product) => (
+                        <div className="draggable-product-item">
+                          <div className="product-info">
+                            <span className="product-icon">{product.icon}</span>
+                            <span className="product-name">{product.name}</span>
+                            <span className="product-order">#{product.order || 0}</span>
+                          </div>
+                          {!bulkMode && (
+                            <button 
+                              className="admin-btn danger small"
+                              onClick={() => deleteProduct(product.id)}
+                              disabled={loading}
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    />
+                  </>
+                ) : (
+                  <div className="empty-products">
+                    <p>No products yet. Add your first product above.</p>
                   </div>
-                ))}
+                )}
               </div>
             </div>
           ))}
         </div>
       </div>
+
+      {/* Live Preview */}
+      <LivePreview
+        productData={newProductData}
+        isVisible={livePreviewVisible}
+        onToggle={toggleLivePreview}
+        compact={true}
+      />
+
+      {/* Preview Modal */}
+      <PreviewModal
+        isOpen={previewModal.isOpen}
+        onClose={closePreviewModal}
+        previewData={previewModal.data}
+        onPublish={handlePublishFromPreview}
+        onSaveDraft={handleSaveDraft}
+        loading={loading}
+      />
+
+      {/* Image Gallery Modal */}
+      {imageGalleryOpen && (
+        <ImageGallery
+          onImageSelect={handleImageSelect}
+          onClose={() => setImageGalleryOpen(false)}
+          multiple={true}
+        />
+      )}
     </div>
   );
 };
@@ -294,9 +640,20 @@ const ProductExplorer = () => {
         .product-details { padding: 20px; display: flex; gap: 16px; align-items: flex-start; }
         .product-icon { font-size: 32px; min-width: 50px; text-align: center; }
         .product-description { font-size: 14px; line-height: 1.6; color: #64748b; flex: 1; }
+        .product-description p { margin: 0 0 8px 0; }
+        .product-description p:last-child { margin-bottom: 0; }
+        .product-description ul, .product-description ol { margin: 8px 0; padding-left: 20px; }
+        .product-description li { margin: 4px 0; }
+        .product-description a { color: #667eea; text-decoration: underline; }
+        .product-description strong { font-weight: 600; }
         .admin-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
         .admin-panel { background: white; border-radius: 12px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
         .admin-header { background: #1e293b; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+        .preview-toggle-btn, .bulk-toggle-btn { padding: 8px 16px; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+        .preview-toggle-btn:hover, .bulk-toggle-btn:hover { background: rgba(255,255,255,0.3); }
+        .preview-toggle-btn.active { background: #667eea; }
+        .bulk-toggle-btn.active { background: #10b981; }
         .close-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 4px; }
         .admin-section { padding: 24px; border-bottom: 1px solid #e2e8f0; }
         .admin-section h3 { margin-bottom: 16px; color: #1e293b; }
@@ -306,9 +663,22 @@ const ProductExplorer = () => {
         .admin-input.tiny { min-width: 60px; max-width: 80px; }
         .admin-category { background: #f8fafc; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
         .admin-category-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .add-product-section { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
-        .products-admin-list { display: flex; flex-wrap: wrap; gap: 8px; }
-        .product-admin-item { background: white; padding: 6px 12px; border-radius: 4px; font-size: 13px; border: 1px solid #e2e8f0; }
+        .add-product-section { display: flex; flex-direction: column; gap: 16px; margin-bottom: 12px; }
+        .product-form-row { display: flex; gap: 12px; align-items: center; }
+        .rich-text-section { display: flex; flex-direction: column; gap: 8px; }
+        .editor-label { font-size: 14px; font-weight: 500; color: #374151; }
+        .form-actions { display: flex; gap: 8px; align-items: center; }
+        .image-section { display: flex; flex-direction: column; gap: 8px; }
+        .image-actions { display: flex; gap: 8px; margin-top: 8px; }
+        .products-admin-section { margin-top: 16px; }
+        .section-header { margin-bottom: 12px; }
+        .section-header h4 { margin: 0; font-size: 14px; color: #374151; font-weight: 500; }
+        .draggable-product-item { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .product-info { display: flex; align-items: center; gap: 8px; flex: 1; }
+        .product-icon { font-size: 16px; }
+        .product-name { font-weight: 500; color: #1e293b; flex: 1; }
+        .product-order { font-size: 12px; color: #64748b; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; }
+        .empty-products { text-align: center; padding: 20px; color: #64748b; font-style: italic; }
         .loading-message { text-align: center; padding: 40px; font-size: 16px; color: #64748b; }
         .error-message { background: #fee2e2; border: 1px solid #fecaca; color: #dc2626; padding: 16px; border-radius: 8px; margin: 20px; text-align: center; }
         .retry-btn { background: #dc2626; color: white; border: none; padding: 8px 16px; border-radius: 4px; margin-left: 12px; cursor: pointer; }

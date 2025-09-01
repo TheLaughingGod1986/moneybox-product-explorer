@@ -24,7 +24,7 @@ npm install
 ```bash
 npm run dev
 ```
-This starts both frontend (http://localhost:3000) and backend (http://localhost:3001)
+This starts both frontend (http://localhost:3000) and backend (http://localhost:3002)
 
 3. **Run Tests**
 ```bash
@@ -33,8 +33,43 @@ npm test
 
 4. **Build for Production**
 ```bash
-npm run build
+npm run build:production
 ```
+
+5. **Start Production Server**
+```bash
+npm start
+```
+
+## Production Deployment
+
+### Quick Deploy with Docker
+```bash
+# Build and start all services
+npm run docker:build
+npm run docker:up
+
+# Check health
+npm run health:check
+```
+
+### Manual Deployment
+```bash
+# 1. Install production dependencies
+npm install --production
+
+# 2. Build frontend assets
+npm run build:production
+
+# 3. Start production server
+NODE_ENV=production npm start
+```
+
+### Environment Variables
+Create appropriate `.env` files or set environment variables:
+- `NODE_ENV=production`
+- `PORT=3002` (server port)
+- `CORS_ORIGIN=https://yourdomain.com` (frontend URL)
 
 ## Architecture
 
