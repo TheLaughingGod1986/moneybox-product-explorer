@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Settings, Plus, Edit, Trash2, Eye } from 'lucide-react';
 import { apiService } from '../services/api.js';
+import { sanitizeHTML } from '../utils/security.js';
 import RichTextEditor from './RichTextEditor.jsx';
 import DraggableList from './DraggableList.jsx';
 import BulkActionsToolbar from './BulkActionsToolbar.jsx';
@@ -56,7 +57,7 @@ const ProductCard = ({ product, isExpanded, onToggle }) => {
             )}
             <div 
               className="product-description"
-              dangerouslySetInnerHTML={{ __html: product.description }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHTML(product.description) }}
             />
           </div>
         </div>

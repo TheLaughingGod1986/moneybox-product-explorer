@@ -31,8 +31,14 @@ app.use((req, res, next) => {
     
     // Log performance (in production, send to monitoring service)
     if (duration > 200) {
-      console.warn('⚠️  SLOW API RESPONSE:', logData);
-    } else {
+      console.warn('⚠️  SLOW API RESPONSE:', {
+        method: logData.method,
+        url: logData.url,
+        statusCode: logData.statusCode,
+        responseTime: logData.responseTime,
+        timestamp: logData.timestamp
+      });
+    } else if (process.env.NODE_ENV !== 'production') {
       console.log('✅ API Response:', logData);
     }
   });
@@ -74,7 +80,14 @@ const strictLimiter = rateLimit({
 });
 
 // Basic middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://moneybox.com', 'https://www.moneybox.com'] 
+    : ['http://localhost:3000', 'http://localhost:3001'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json({ limit: '10mb' })); // Limit JSON payload size
 // Static file serving
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
