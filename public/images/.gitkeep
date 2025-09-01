@@ -1,0 +1,13 @@
+# Static Images Directory
+
+This directory contains static image assets for the Moneybox Product Explorer.
+
+## Usage
+- Place static images (logos, icons, graphics) here
+- Images are served directly by the web server
+- Accessible at `/images/filename.ext` URL path
+- Supports PNG, JPG, SVG, WebP formats
+
+## Examples
+- `public/images/logo.png` → Available at `/images/logo.png`
+- `public/images/icons/savings.svg` → Available at `/images/icons/savings.svg`
