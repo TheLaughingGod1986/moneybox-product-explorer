@@ -27,6 +27,13 @@ export const apiService = {
   createProduct: (data) => api.post('/products', data),
   updateProduct: (id, data) => api.put(`/products/${id}`, data),
   deleteProduct: (id) => api.delete(`/products/${id}`),
+  reorderProducts: (categoryId, productOrders) => api.put(`/categories/${categoryId}/products/reorder`, { productOrders }),
+  bulkOperation: (action, productIds, data = null) => api.post('/products/bulk', { action, productIds, data }),
+  
+  // Images
+  uploadImage: (imageData, name, type) => api.post('/images/upload', { imageData, name, type }),
+  getImages: () => api.get('/images'),
+  deleteImage: (filename) => api.delete(`/images/${filename}`),
   
   // Health check
   healthCheck: () => api.get('/health'),
