@@ -104,7 +104,44 @@ POST   /api/products            # Create new product
 PUT    /api/products/:id        # Update product  
 DELETE /api/products/:id        # Delete product
 GET    /api/health              # Health check
+POST   /api/upload              # Upload images
+GET    /api/images              # Get image gallery
+DELETE /api/images/:filename    # Delete image
 ```
+
+## Image Management
+
+The application includes a comprehensive image management system with organized directory structure:
+
+### Static Images (`public/images/`)
+Static assets served directly by the web server:
+```
+public/images/
+├── icons/          # UI icons (SVG preferred)
+├── logos/          # Brand logos and graphics
+└── graphics/       # Illustrations and decorative images
+```
+
+**Access**: Available at `/images/filename.ext` URL path
+
+### User Uploads (`server/uploads/images/`)
+Dynamic content uploaded via the admin interface:
+```
+server/uploads/images/
+├── products/       # Product images
+├── categories/     # Category images
+└── thumbnails/     # Auto-generated thumbnails
+```
+
+**Features**:
+- ✅ Drag & drop upload interface
+- ✅ Automatic compression (60% size reduction)
+- ✅ Format support: PNG, JPG, GIF, WebP
+- ✅ Gallery management with preview
+- ✅ Thumbnail generation
+- ✅ Bulk operations (select, delete, organize)
+
+**Access**: Available at `/uploads/images/filename.ext` URL path
 
 ## Tech Stack
 

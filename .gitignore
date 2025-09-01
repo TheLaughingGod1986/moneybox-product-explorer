@@ -96,6 +96,15 @@ temp/
 # Server uploads (development)
 server/uploads/*
 !server/uploads/.gitkeep
+!server/uploads/images/
+server/uploads/images/*
+!server/uploads/images/.gitkeep
+!server/uploads/images/products/
+!server/uploads/images/categories/
+!server/uploads/images/thumbnails/
+
+# Keep public images (static assets should be committed)
+# public/images/ - not ignored, these are static assets
 
 # Testing
 coverage/

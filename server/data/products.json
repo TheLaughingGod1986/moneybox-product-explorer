@@ -1,76 +1,108 @@
 {
   "categories": [
     {
-      "id": "savings",
-      "name": "Savings",
+      "id": "category-1756689026562",
+      "name": "ISAs & Savings",
       "order": 1,
       "products": [
         {
-          "id": "cash-isa",
+          "id": "product-1756689033802",
           "name": "Cash ISA",
-          "description": "A tax-free way to save up to £20,000 per year with instant access to your money",
-          "icon": "💰",
-          "order": 1
+          "description": "<p>Save up to £20,000 tax-free each year with our competitive Cash ISA rates.</p><ul><li>Tax-free interest</li><li>Easy access to your money</li><li>No fees or charges</li><li>Annual allowance: £20,000</li></ul>",
+          "icon": "cash_isa",
+          "order": 1,
+          "updatedAt": "2025-09-01T01:23:17.899Z"
         },
         {
-          "id": "easy-access",
-          "name": "Easy Access Account",
-          "description": "Instant access to your money with competitive interest rates and no monthly fees",
-          "icon": "🏦",
-          "order": 2
+          "id": "product-1756689040486",
+          "name": "Stocks & Shares ISA",
+          "description": "<p>Invest up to £20,000 tax-free each year in a diversified portfolio of ETFs.</p><ul><li>Tax-free growth potential</li><li>Diversified investment portfolio</li><li>Low-cost ETF investing</li><li>Annual allowance: £20,000</li></ul>",
+          "icon": "stocks_shares_isa",
+          "order": 2,
+          "updatedAt": "2025-09-01T01:23:24.150Z"
+        },
+        {
+          "id": "product-1756689047805",
+          "name": "Lifetime ISA",
+          "description": "<p>Save for your first home or retirement with a 25% government bonus on contributions up to £4,000 per year.</p><ul><li>25% government bonus</li><li>Use for first home or retirement</li><li>Annual contribution limit: £4,000</li><li>Available ages 18-39</li></ul>",
+          "icon": "lifetime_isa",
+          "order": 3,
+          "updatedAt": "2025-09-01T01:23:31.851Z"
+        },
+        {
+          "id": "product-1756689054404",
+          "name": "Junior ISA",
+          "description": "<p>Start saving for your child's future with tax-free growth up to £9,000 per year.</p><ul><li>Tax-free savings for children</li><li>Available until age 18</li><li>Annual allowance: £9,000</li><li>Child gets access at 18</li></ul>",
+          "icon": "junior_isa",
+          "order": 4,
+          "updatedAt": "2025-09-01T01:23:37.605Z"
         }
       ]
     },
     {
-      "id": "investing",
-      "name": "Investing",
+      "id": "category-1756689060422",
+      "name": "Pensions",
       "order": 2,
       "products": [
         {
-          "id": "stocks-shares-isa",
-          "name": "Stocks & Shares ISA",
-          "description": "Invest up to £20,000 tax-free in a diversified portfolio of funds",
-          "icon": "📈",
-          "order": 1
-        },
-        {
-          "id": "general-investment",
-          "name": "General Investment Account",
-          "description": "Flexible investing with no annual limits and access to a wide range of funds",
-          "icon": "💹",
-          "order": 2
+          "id": "product-1756689067337",
+          "name": "Personal Pension",
+          "description": "<p>Build your retirement pot with tax relief on contributions and investment growth.</p><ul><li>Tax relief on contributions</li><li>Flexible contribution options</li><li>Diversified investment portfolio</li><li>Access from age 55</li></ul>",
+          "icon": "personal_pension",
+          "order": 1,
+          "updatedAt": "2025-09-01T01:23:43.776Z"
         }
       ]
     },
     {
-      "id": "pensions",
-      "name": "Pensions",
+      "id": "category-1756689072717",
+      "name": "Cash Savings",
       "order": 3,
       "products": [
         {
-          "id": "personal-pension",
-          "name": "Personal Pension",
-          "description": "Build your retirement fund with tax relief and employer contributions",
-          "icon": "🏡",
-          "order": 1
+          "id": "product-1756689079383",
+          "name": "Simple Saver",
+          "description": "<p>Easy access savings account with competitive interest rates and no fees.</p><ul><li>Instant access to your money</li><li>Competitive interest rates</li><li>No minimum balance</li><li>No monthly fees</li></ul>",
+          "icon": "simple_saver",
+          "order": 1,
+          "updatedAt": "2025-09-01T01:23:49.009Z"
+        },
+        {
+          "id": "product-1756689086189",
+          "name": "32 Day Notice Account",
+          "description": "<p>Higher interest savings account with 32 days notice required for withdrawals.</p><ul><li>Higher interest rates</li><li>32 day notice period</li><li>No fees or charges</li><li>Minimum balance: £1</li></ul>",
+          "icon": "32_day_notice",
+          "order": 2,
+          "updatedAt": "2025-09-01T01:23:55.126Z"
+        },
+        {
+          "id": "product-1756689092072",
+          "name": "95 Day Notice Account",
+          "description": "<p>Premium savings account offering our highest interest rates with 95 days notice.</p><ul><li>Premium interest rates</li><li>95 day notice period</li><li>No fees or charges</li><li>Minimum balance: £1</li></ul>",
+          "icon": "95_day_notice",
+          "order": 3,
+          "updatedAt": "2025-09-01T01:24:00.400Z"
         }
       ]
     },
     {
-      "id": "category-1756680506298",
-      "name": "Test Category",
+      "id": "category-1756689098015",
+      "name": "Investments",
       "order": 4,
-      "products": []
-    },
-    {
-      "id": "category-1756681813088",
-      "name": "Test Security Category",
-      "order": 5,
-      "products": []
+      "products": [
+        {
+          "id": "product-1756689104741",
+          "name": "General Investment Account",
+          "description": "<p>Invest in a diversified portfolio of ETFs without annual contribution limits.</p><ul><li>No annual contribution limits</li><li>Diversified ETF portfolio</li><li>Low management fees</li><li>Flexible withdrawals</li></ul>",
+          "icon": "general_investment_account",
+          "order": 1,
+          "updatedAt": "2025-09-01T01:24:05.889Z"
+        }
+      ]
     }
   ],
   "metadata": {
-    "lastUpdated": "2025-08-31T23:18:42.903Z",
+    "lastUpdated": "2025-09-01T01:24:05.889Z",
     "version": "1.0.0"
   }
 }
